@@ -16,7 +16,7 @@ final _perspecive = 0.01;
 final _magnify = 1.0;
 final _extent = 44.0;
 final _pickerHeight = 170.0;
-final _pickerWidth = 200.0;
+final _pickerWidth = 185.0;
 
 class InitialScreen extends ModularStatelessWidget<InitialModule> {
   @override
@@ -62,6 +62,8 @@ class __InitialWidget extends State<_InitialWidget> {
   ListWheelChildDelegate _minuteDelegate;
   ListWheelChildDelegate _secondDelegate;
   ListWheelChildDelegate _meridianDelegate;
+  ListWheelChildDelegate _colonDelegate;
+  ListWheelChildDelegate _dashDelegate;
 
   final DateTimeEvent dateTimeEvent = DateTimeEvent();
 
@@ -75,6 +77,8 @@ class __InitialWidget extends State<_InitialWidget> {
     _minuteDelegate = MinuteDelegate(dateTimeEvent);
     _secondDelegate = SecondDelegate(dateTimeEvent);
     _meridianDelegate = MeridianDelegate(dateTimeEvent);
+    _colonDelegate = SeperatorDelegate(':');
+    _dashDelegate = SeperatorDelegate('-');
   }
 
   @override
@@ -94,23 +98,31 @@ class __InitialWidget extends State<_InitialWidget> {
       color: Colors.red,
       width: _pickerWidth,
       child: Row(children: [
-        Container(height: _pickerHeight, width: _pickerWidth * 0.2631, child: _dayWidget()),
-        Container(height: _pickerHeight, width: _pickerWidth * 0.3684, child: _monthWidget()),
-        Container(height: _pickerHeight, width: _pickerWidth * 0.3684, child: _yearWidget()),
+        Container(height: _pickerHeight, width: _pickerWidth * 0.24, child: _dayWidget()),
+        Container(height: _pickerHeight, width: _pickerWidth * 0.04, child: _dashWidget()),
+        Container(height: _pickerHeight, width: _pickerWidth * 0.33, child: _monthWidget()),
+        Container(height: _pickerHeight, width: _pickerWidth * 0.04, child: _dashWidget()),
+        Container(height: _pickerHeight, width: _pickerWidth * 0.33, child: _yearWidget()),
       ]),
     );
   }
 
   Widget _timePicker() {
+    final slice = _pickerWidth / 24.0;
+    final colonSlice = slice * 2.0;
+    final timeSlice = slice * 5.0;
+    final row = [
+      Container(height: _pickerHeight, width: timeSlice, child: _hourWidget()),
+      Container(height: _pickerHeight, width: colonSlice, child: _colonWidget()),
+      Container(height: _pickerHeight, width: timeSlice, child: _minuteWidget()),
+      Container(height: _pickerHeight, width: colonSlice, child: _colonWidget()),
+      Container(height: _pickerHeight, width: timeSlice, child: _secondWidget()),
+      Container(height: _pickerHeight, width: timeSlice, child: _meridianWidget()),
+    ];
     return Container(
       color: Colors.green,
       width: _pickerWidth,
-      child: Row(children: [
-        Container(height: _pickerHeight, width: _pickerWidth / 4.0, child: _hourWidget()),
-        Container(height: _pickerHeight, width: _pickerWidth / 4.0, child: _minuteWidget()),
-        Container(height: _pickerHeight, width: _pickerWidth / 4.0, child: _secondWidget()),
-        Container(height: _pickerHeight, width: _pickerWidth / 4.0, child: _meridianWidget()),
-      ]),
+      child: Row(children: row),
     );
   }
 
@@ -201,6 +213,32 @@ class __InitialWidget extends State<_InitialWidget> {
       overAndUnderCenterOpacity: _opacity,
       perspective: _perspecive,
       offAxisFraction: 1.0,
+      magnification: _magnify,
+    );
+  }
+
+  Widget _colonWidget() {
+    return ListWheelScrollView.useDelegate(
+      childDelegate: _colonDelegate,
+      controller: FixedExtentScrollController(),
+      itemExtent: _extent,
+      physics: FixedExtentScrollPhysics(),
+      overAndUnderCenterOpacity: _opacity,
+      perspective: _perspecive,
+      offAxisFraction: 0.0,
+      magnification: _magnify,
+    );
+  }
+
+  Widget _dashWidget() {
+    return ListWheelScrollView.useDelegate(
+      childDelegate: _dashDelegate,
+      controller: FixedExtentScrollController(),
+      itemExtent: _extent,
+      physics: FixedExtentScrollPhysics(),
+      overAndUnderCenterOpacity: _opacity,
+      perspective: _perspecive,
+      offAxisFraction: 0.0,
       magnification: _magnify,
     );
   }

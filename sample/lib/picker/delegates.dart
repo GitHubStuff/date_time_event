@@ -110,3 +110,17 @@ class MeridianDelegate extends ListWheelChildDelegate {
 
   int get estimatedChildCount => 2;
 }
+
+//MARK:
+class SeperatorDelegate extends ListWheelChildDelegate {
+  final String seperator;
+  SeperatorDelegate(this.seperator);
+  Widget build(BuildContext context, int index) {
+    if (index != 0) return null;
+    return Text('$seperator', style: _style);
+  }
+
+  bool shouldRebuild(oldDelegate) => true;
+
+  int get estimatedChildCount => 1;
+}
