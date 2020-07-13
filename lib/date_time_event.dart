@@ -3,13 +3,11 @@ library date_time_event;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-enum Meridian { AM, PM }
+//enum Meridian { AM, PM }
 
 const _dateFormat = 'EEE, MMM d, yyyy';
 const _timeFormat = 'h:mm:ss a';
 const _FEBRUARY = 2;
-
-String _padded(int value) => (value < 9) ? '0$value' : '$value';
 
 ///
 class DateTimeEvent {
@@ -33,9 +31,10 @@ class DateTimeEvent {
   String get formattedTime => DateFormat('$_timeFormat').format(_dateTime);
   String get formattedDate => DateFormat('$_dateFormat').format(_dateTime);
   bool get isLeapYear => _leapYear(event.year);
-  Meridian get meridian => _dateTime.hour < 12 ? Meridian.AM : Meridian.PM;
-  String get minutes => _padded(_dateTime.minute);
-  String get seconds => _padded(_dateTime.second);
+  String get meridian => DateFormat('a').format(event);
+  String get hours => DateFormat('h').format(event);
+  String get minutes => DateFormat('mm').format(event);
+  String get seconds => DateFormat('ss').format(event);
 
   void setNew({int year, int month, int day, int hour, int minute, int second}) {
     DateTime newTime = DateTime(

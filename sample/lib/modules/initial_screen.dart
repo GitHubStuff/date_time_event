@@ -1,4 +1,5 @@
 import 'package:date_time_event/date_time_event.dart';
+import 'package:sample/picker/delegates.dart';
 
 import '../resources/widgets/theme_icon_widget.dart';
 import 'package:tracers/tracers.dart' as Log;
@@ -10,47 +11,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mode_theme/mode_theme.dart';
 
-final _style = TextStyle(fontSize: 24);
-
-class DayDelegate extends ListWheelChildDelegate {
-  DateTimeEvent event;
-  DayDelegate(this.event);
-  Widget build(BuildContext context, int index) {
-    if (index < 1 || index > event.days) return null;
-    return Text('$index', style: _style);
-  }
-
-  bool shouldRebuild(oldDelegate) => true;
-
-  int get estimatedChildCount => event.days;
-}
-
-class MonthDelegate extends ListWheelChildDelegate {
-  final text = ['', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-  DateTimeEvent event;
-  MonthDelegate(this.event);
-  Widget build(BuildContext context, int index) {
-    if (index < 1 || index > 12) return null;
-    return Text('${text[index]}', style: _style);
-  }
-
-  bool shouldRebuild(oldDelegate) => true;
-
-  int get estimatedChildCount => 12;
-}
-
-class YearDelegate extends ListWheelChildDelegate {
-  DateTimeEvent event;
-  YearDelegate(this.event);
-  Widget build(BuildContext context, int index) {
-    if (index + 1700 < 1700 || index + 1700 > 2199) return null;
-    return Text('${index + 1700}', style: _style);
-  }
-
-  bool shouldRebuild(oldDelegate) => true;
-
-  int get estimatedChildCount => 1499;
-}
+final _opacity = 0.5;
+final _perspecive = 0.01;
+final _magnify = 1.0;
+final _extent = 44.0;
+final _pickerHeight = 170.0;
+final _pickerWidth = 200.0;
 
 class InitialScreen extends ModularStatelessWidget<InitialModule> {
   @override
@@ -89,60 +55,153 @@ class _InitialWidget extends StatefulWidget {
 
 //MARK:
 class __InitialWidget extends State<_InitialWidget> {
-  ListWheelChildDelegate dayDelegate;
-  ListWheelChildDelegate monthDelegate;
-  ListWheelChildDelegate yearDelegate;
+  ListWheelChildDelegate _dayDelegate;
+  ListWheelChildDelegate _monthDelegate;
+  ListWheelChildDelegate _yearDelegate;
+  ListWheelChildDelegate _hourDelegate;
+  ListWheelChildDelegate _minuteDelegate;
+  ListWheelChildDelegate _secondDelegate;
+  ListWheelChildDelegate _meridianDelegate;
 
   final DateTimeEvent dateTimeEvent = DateTimeEvent();
 
   @override
   void initState() {
     super.initState();
-    dayDelegate = DayDelegate(dateTimeEvent);
-    monthDelegate = MonthDelegate(dateTimeEvent);
-    yearDelegate = YearDelegate(dateTimeEvent);
+    _dayDelegate = DayDelegate(dateTimeEvent);
+    _monthDelegate = MonthDelegate(dateTimeEvent);
+    _yearDelegate = YearDelegate(dateTimeEvent);
+    _hourDelegate = HourDelegate(dateTimeEvent);
+    _minuteDelegate = MinuteDelegate(dateTimeEvent);
+    _secondDelegate = SecondDelegate(dateTimeEvent);
+    _meridianDelegate = MeridianDelegate(dateTimeEvent);
   }
 
   @override
   Widget build(BuildContext context) {
-    final height = 170.0;
     return Center(
-      child: Container(
-        color: Colors.red,
-        width: 190.0,
-        child: Row(children: [
-          Container(height: height, width: 50, child: _dayWidget()),
-          Container(height: height, width: 70, child: _monthWidget()),
-          Container(height: height, width: 70, child: _yearWidget()),
-        ]),
+      child: Column(
+        children: [
+          _datePicker(),
+          _timePicker(),
+        ],
       ),
+    );
+  }
+
+  Widget _datePicker() {
+    return Container(
+      color: Colors.red,
+      width: _pickerWidth,
+      child: Row(children: [
+        Container(height: _pickerHeight, width: _pickerWidth * 0.2631, child: _dayWidget()),
+        Container(height: _pickerHeight, width: _pickerWidth * 0.3684, child: _monthWidget()),
+        Container(height: _pickerHeight, width: _pickerWidth * 0.3684, child: _yearWidget()),
+      ]),
+    );
+  }
+
+  Widget _timePicker() {
+    return Container(
+      color: Colors.green,
+      width: _pickerWidth,
+      child: Row(children: [
+        Container(height: _pickerHeight, width: _pickerWidth / 4.0, child: _hourWidget()),
+        Container(height: _pickerHeight, width: _pickerWidth / 4.0, child: _minuteWidget()),
+        Container(height: _pickerHeight, width: _pickerWidth / 4.0, child: _secondWidget()),
+        Container(height: _pickerHeight, width: _pickerWidth / 4.0, child: _meridianWidget()),
+      ]),
     );
   }
 
   Widget _dayWidget() {
     return ListWheelScrollView.useDelegate(
-      childDelegate: dayDelegate,
+      childDelegate: _dayDelegate,
       controller: FixedExtentScrollController(),
-      itemExtent: 44.0,
+      itemExtent: _extent,
       physics: FixedExtentScrollPhysics(),
+      overAndUnderCenterOpacity: _opacity,
+      perspective: _perspecive,
+      offAxisFraction: -1.0,
+      magnification: _magnify,
     );
   }
 
   Widget _monthWidget() {
     return ListWheelScrollView.useDelegate(
-      childDelegate: monthDelegate,
+      childDelegate: _monthDelegate,
       controller: FixedExtentScrollController(),
-      itemExtent: 44.0,
+      itemExtent: _extent,
       physics: FixedExtentScrollPhysics(),
+      overAndUnderCenterOpacity: _opacity,
+      perspective: _perspecive,
+      offAxisFraction: 0.0,
+      magnification: _magnify,
     );
   }
 
   Widget _yearWidget() {
     return ListWheelScrollView.useDelegate(
-      childDelegate: yearDelegate,
+      childDelegate: _yearDelegate,
       controller: FixedExtentScrollController(),
-      itemExtent: 44.0,
+      itemExtent: _extent,
       physics: FixedExtentScrollPhysics(),
+      overAndUnderCenterOpacity: _opacity,
+      perspective: _perspecive,
+      offAxisFraction: 0.3,
+      magnification: _magnify,
+    );
+  }
+
+  Widget _hourWidget() {
+    return ListWheelScrollView.useDelegate(
+      childDelegate: _hourDelegate,
+      controller: FixedExtentScrollController(),
+      itemExtent: _extent,
+      physics: FixedExtentScrollPhysics(),
+      overAndUnderCenterOpacity: _opacity,
+      perspective: _perspecive,
+      offAxisFraction: -1.0,
+      magnification: _magnify,
+    );
+  }
+
+  Widget _minuteWidget() {
+    return ListWheelScrollView.useDelegate(
+      childDelegate: _minuteDelegate,
+      controller: FixedExtentScrollController(),
+      itemExtent: _extent,
+      physics: FixedExtentScrollPhysics(),
+      overAndUnderCenterOpacity: _opacity,
+      perspective: _perspecive,
+      offAxisFraction: -0.1,
+      magnification: _magnify,
+    );
+  }
+
+  Widget _secondWidget() {
+    return ListWheelScrollView.useDelegate(
+      childDelegate: _secondDelegate,
+      controller: FixedExtentScrollController(),
+      itemExtent: _extent,
+      physics: FixedExtentScrollPhysics(),
+      overAndUnderCenterOpacity: _opacity,
+      perspective: _perspecive,
+      offAxisFraction: 0.1,
+      magnification: _magnify,
+    );
+  }
+
+  Widget _meridianWidget() {
+    return ListWheelScrollView.useDelegate(
+      childDelegate: _meridianDelegate,
+      controller: FixedExtentScrollController(),
+      itemExtent: _extent,
+      physics: FixedExtentScrollPhysics(),
+      overAndUnderCenterOpacity: _opacity,
+      perspective: _perspecive,
+      offAxisFraction: 1.0,
+      magnification: _magnify,
     );
   }
 }
